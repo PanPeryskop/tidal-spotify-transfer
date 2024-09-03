@@ -13,9 +13,9 @@ tidal_session_file = Path('tidal_session.json')
 session = tidalapi.Session()
 session.login_session_file(tidal_session_file)
 
+client_id, client_secret, redirect_uri = None, None, None
+
 session.audio_quality = Quality.hi_res
-
-
 
 
 def load_spoify_playlist():
@@ -50,24 +50,42 @@ def create_track_infos(tracks):
     return track_infos
 
 
-def add_track_to_playist(track_id, playlist_id):
-
+def add_track_to_playlist_tidal(track_id, playlist_id):
+    # just tell me whyyyyy
+    # tidal_playlist = Playlist(playlist_id, session)
+    # tidal_playlist.add_track(track_id)
     pass
 
 
 def load_config():
-    pass
+    global client_id
+    global client_secret
+    global redirect_uri
+
+    if Path('config.json').exists():
+        with open('config.json', 'r') as file:
+            config = json.load(file)
+            client_id = config['client_id']
+            client_secret = config['client_secret']
+            redirect_uri = config['redirect_uri']
+    else:
+        print('Config file not found')
+        client_id = input('Enter client_id: ')
+        client_secret = input('Enter client_secret: ')
+        redirect_uri = input('Enter redirect_uri: ')
+        with open('config.json', 'w') as file:
+            config = {
+                'client_id': client_id,
+                'client_secret': client_secret,
+                'redirect_uri': redirect_uri
+            }
+            json.dump(config, file)
 
 
 def search_tidal_track_id(artist_name, track_name):
     query = f'{artist_name} {track_name}'
     search = session.search(query = query, limit = 1)
-    return search.tracks[0].id
-
-
-scope = 'playlist-read-private user-modify-playback-state playlist-modify-public playlist-modify-private user-top-read'
-auth_manager = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope=scope)
-sp = spotipy.Spotify(auth_manager=auth_manager)
+    return search # i need heeeeelp, i'm falling down, so tell me whyyyyy, i'm falling down , you used to call me on my cell phone, late night when you need my love, call me on my cell phone, late night when you need my love, and i know when that hotline bling, that can only mean one thing, i know when that hotline bling, that can only mean one thing, ever since i left the city you, got a reputation for yourself now, everybody knows and i feel left
 
 
 def processor():
@@ -76,14 +94,23 @@ def processor():
 
     if len(track_infos) > 0:
 
-        tidal_playlsit_id = create_tidal_playlist()
+        tidal_playlist_ids = create_tidal_playlist()
 
         for artist_name, track_name in track_infos:
             tidal_track_id = search_tidal_track_id(artist_name, track_name)
-            add_track_to_playist(tidal_track_id, tidal_playlsit_id)
+            add_track_to_playist(tidal_track_id, tidal_playlist_ids)
 
 
     else:
         print('No tracks found in the playlist')
         print('Closing...')
         exit()
+
+
+load_config()
+
+scope = 'playlist-read-private user-modify-playback-state playlist-modify-public playlist-modify-private user-top-read'
+auth_manager = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope=scope)
+sp = spotipy.Spotify(auth_manager=auth_manager)
+
+
