@@ -1,5 +1,7 @@
 # Spotify-Tidal
 
+**⚠️ Warning: This application is currently under early development and has not been even tested. It may not work as expected. Use at your own risk. ⚠️**
+
 Spotify-Tidal is a Python application that allows users to transfer their Spotify playlists to Tidal. The application uses the Spotify and Tidal APIs to fetch playlists from Spotify and recreate them in Tidal.
 
 ## Resources used
