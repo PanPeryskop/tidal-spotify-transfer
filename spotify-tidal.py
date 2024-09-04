@@ -4,7 +4,6 @@ from tidalapi import Quality
 from tidalapi import Playlist
 from pathlib import Path
 from spotipy.oauth2 import SpotifyOAuth
-import requests
 import json
 
 def load_spoify_playlist():
@@ -38,7 +37,7 @@ def get_track_info(spotify_track_id):
     return artist_name, track_name
 
 
-def create_track_infos(tracks):
+def create_track_info(tracks):
     track_infos = []
     for track in tracks:
         artist_name, track_name = get_track_info(track['id'])
@@ -88,12 +87,14 @@ def load_config():
 
 def search_tidal_track_id(artist_name, track_name):
     query = f'{artist_name} {track_name}'
-    search = session.search(query = query, limit = 1)
+    search = session.search(query, models=[tidalapi.media.Track])['tracks']
+    if len(search) > 0:
+        search = search[0]
     return search
 
 def processor():
     tracks, playlist_name = load_spoify_playlist()
-    track_infos = create_track_infos(tracks)
+    track_infos = create_track_info(tracks)
 
     if len(track_infos) > 0:
 
@@ -121,6 +122,5 @@ session = tidalapi.Session()
 
 session.login(tidal_username, tidal_password)
 session.audio_quality = Quality.hi_res
-
 
 processor()
