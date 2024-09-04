@@ -12,16 +12,23 @@ def load_spoify_playlist():
     if playlist_url.startswith('https://open.spotify.com/playlist/'):
         playlist_id = playlist_url.split('/')[-1].split('?')[0]
         tracks = sp.playlist_tracks(playlist_id)
-        return tracks
+        playlist_name = sp.playlist(playlist_id)['name']
+        return tracks, playlist_name
     else:
         print('Invalid URL')
         print('Closing...')
         exit()
 
 
-def create_tidal_playlist():
-    tidal_playlist_id = "test"
-    return tidal_playlist_id
+def create_tidal_playlist(playlist_name):
+    user_input = input('Do you want playlist to be public? (y/n): ')
+    
+    if user_input.lower() == 'y':
+        tidal_playlist = session.user.create_playlist(playlist_name, 'Transfered from spotify', public=True)
+    else:
+        tidal_playlist = session.user.create_playlist(playlist_name, 'Transfered from spotify', public=False)
+
+    return tidal_playlist
 
 
 def get_track_info(spotify_track_id):
@@ -42,7 +49,6 @@ def create_track_infos(tracks):
 def add_track_to_playlist_tidal(track_id, playlist_id):
     tidal_playlist = Playlist(playlist_id, session)
     tidal_playlist.add(track_id)
-
     pass
 
 
@@ -73,7 +79,9 @@ def load_config():
             config = {
                 'client_id': client_id,
                 'client_secret': client_secret,
-                'redirect_uri': redirect_uri
+                'redirect_uri': redirect_uri,
+                'tidal_username': tidal_username,
+                'tidal_password': tidal_password
             }
             json.dump(config, file)
 
@@ -84,16 +92,16 @@ def search_tidal_track_id(artist_name, track_name):
     return search
 
 def processor():
-    tracks = load_spoify_playlist()
+    tracks, playlist_name = load_spoify_playlist()
     track_infos = create_track_infos(tracks)
 
     if len(track_infos) > 0:
 
-        tidal_playlist_ids = create_tidal_playlist()
+        tidal_playlist = create_tidal_playlist(playlist_name)
 
         for artist_name, track_name in track_infos:
             tidal_track_id = search_tidal_track_id(artist_name, track_name)
-            add_track_to_playlist_tidal(tidal_track_id, tidal_playlist_ids)
+            add_track_to_playlist_tidal(tidal_track_id, tidal_playlist)
     else:
         print('No tracks found in the playlist')
         print('Closing...')
