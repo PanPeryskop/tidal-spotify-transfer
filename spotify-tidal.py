@@ -114,10 +114,5 @@ session = tidalapi.Session()
 session.login(tidal_username, tidal_password)
 session.audio_quality = Quality.hi_res
 
-<<<<<<< HEAD
-#3 ins
 
 processor()
-=======
-processor()
->>>>>>> e979b2a568bda0b2a7814381a934556209cbf88a
