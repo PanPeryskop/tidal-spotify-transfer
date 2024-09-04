@@ -6,7 +6,7 @@ from pathlib import Path
 from spotipy.oauth2 import SpotifyOAuth
 import json
 
-def load_spoify_playlist():
+def load_spotify_playlist():
     playlist_url = input('Enter Spotify Playlist URL: ')
     if playlist_url.startswith('https://open.spotify.com/playlist/'):
         playlist_id = playlist_url.split('/')[-1].split('?')[0]
@@ -93,7 +93,7 @@ def search_tidal_track_id(artist_name, track_name):
     return search
 
 def processor():
-    tracks, playlist_name = load_spoify_playlist()
+    tracks, playlist_name = load_spotify_playlist()
     track_infos = create_track_info(tracks)
 
     if len(track_infos) > 0:
